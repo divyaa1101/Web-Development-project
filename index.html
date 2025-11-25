@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Aesthetic Bean Cafe</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <link rel="stylesheet" href="style.css">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    // Custom colors from :root variables in cafe.css can be mirrored here for Tailwind classes
+                    colors: {
+                        'primary': '#6F4E37',
+                        'secondary': '#D9B998',
+                        'background': '#FBF7F4',
+                        'text': '#3A2A1A',
+                        'card': '#FFFFFF',
+                        'danger': '#A52A2A',
+                    },
+                    // We also ensure Inter font is available for Tailwind utility classes
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <script>
+        // --- SIMULATED FIREBASE SETUP ---
+        // These global variables/functions are mocked or assumed to be loaded by an external Firebase SDK setup script
+        window.appId = 'cafe-app-123';
+        window.currentUserId = null; // Will be set by Firebase auth listener
+        window.isAuthReady = true;
+
+        // Mock Firebase functions to allow cafe.js to run without a real Firebase instance for presentation
+        window.getFirestore = () => ({});
+        window.getAuth = () => ({});
+        window.collection = (db, ...pathSegments) => pathSegments.join('/');
+        window.query = (ref) => ref;
+        window.getDocs = async (queryRef) => ({ empty: true, docs: [] }); // Mock empty snapshot initially
+        window.setDoc = async (docRef, data) => console.log('Mocked setDoc:', docRef, data);
+        window.doc = (db, ...pathSegments) => pathSegments.join('/');
+        window.onSnapshot = (query, callback) => { 
+            console.log('Mocked onSnapshot initialized.'); 
+            // Simulate initial data load after a delay
+            setTimeout(() => callback({ 
+                docs: [
+                    // Mocking the data structure needed if snapshot.empty is false
+                    { id: '1', data: () => ({ name: 'Coffee: Lavender', price: 5.50, description: 'Earthy, floral, and caffeinated.', category: 'Brewed', emoji: '☕' })},    
+                    { id: '2',data:() =>({ name: 'Matcha Latte', price: 6.00, description: 'Bright green goodness with oat milk.', category: 'Specialty', emoji: '🍵' })},
+                    { id: '3',data:() =>({ name: 'Caramel Macchiato', price: 6.50, description: 'Layers of espresso, milk, and sweet caramel.', category: 'Specialty', emoji: '🍮'}) },
+                    { id: '4',data:() =>({ name: 'Chai Spiced Donut', price: 3.50, description: 'Soft donut with a spicy glaze.', category: 'Pastry', emoji: '🍩' })},
+                    { id: '5',data:() =>({ name: 'Avocado Toast', price: 9.00, description: 'Sourdough, smashed avocado, chili flakes.', category: 'Food', emoji: '🥑'}) },
+                    { id: '6', data:() =>({name: 'Chocolate Chip Cookie', price: 2.75, description: 'Classic, chewy, and warm.', category: 'Pastry', emoji: '🍪' })},
+                ]
+            }), 100);
+            return () => {}; // Return unsubscribe function
+        };
+
+        // Mock Auth functions
+        window.createUserWithEmailAndPassword = async (auth, email, password) => ({ user: { uid: 'mockUserReg' + Date.now() } });
+        window.signInWithEmailAndPassword = async (auth, email, password) => { 
+            window.currentUserId = 'mockUserLogin' + Date.now(); 
+            // Manually call renderView since the onAuthStateChanged listener is external
+            setTimeout(() => window.renderView('menu'), 50); 
+            return { user: { uid: window.currentUserId } };
+        };
+        
+        // Initial state
+        window.currentView = 'loading';
+
+    </script>
+</head>
+<body class="min-h-screen flex items-start justify-center p-4">
+    
+    <div id="app" class="w-full max-w-lg shadow-2xl rounded-2xl bg-white" style="color: var(--color-text); margin-top: 5vh;">
+        </div>
+    
+    <div id="confirmationModal" class="hidden fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center p-4" onclick="closeModal()">
+        <div class="bg-white rounded-xl shadow-2xl max-w-sm w-full p-6" onclick="event.stopPropagation()">
+            
+            <h3 id="modalTitle" class="text-2xl font-bold mb-4" style="color: var(--color-primary);">Modal Title</h3>
+            
+            <div id="modalBody" class="text-gray-700 mb-6">
+                </div>
+            
+            <div id="paymentOptions" class="mt-4">
+                </div>
+
+            <button onclick="closeModal()" class="w-full mt-6 py-2 rounded-xl bg-gray-200 text-gray-700 font-semibold hover:bg-gray-300 transition">
+                Close
+            </button>
+        </div>
+    </div>
+    
+    <script src="script.js"></script>
+
+    <script>
+        // Simulated Auth State Listener and Initial Fetch
+        // In a real app, Firebase listener would manage this.
+        window.onload = () => {
+            // Check for mock user or default to login
+            if (window.currentUserId) {
+                window.renderView('menu');
+                window.fetchMenu();
+            } else {
+                window.renderView('login');
+                window.fetchMenu(); // Fetch menu regardless for real-time listener setup
+            }
+        };
+    </script>
+
+</body>
+</html>
