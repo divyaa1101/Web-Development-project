@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>The Aesthetic Bean Cafe</title>
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      /* --- 1. VARIABLES & RESET --- */
+      :root {
+        --color-primary: #6f4e37; /* Coffee Brown */
+        --color-secondary: #d9b998; /* Latte Foam */
+        --color-background: #fbf7f4; /* Off-white */
+        --color-text: #3a2a1a; /* Dark Espresso */
+        --color-card: #ffffff;
+        --color-danger: #a52a2a;
+        --color-success: #22c55e;
+        --font-main: "Inter", sans-serif;
+        --radius: 16px;
+        --shadow: 0 10px 25px rgba(111, 78, 55, 0.15);
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: var(--font-main);
+        background-color: var(--color-background);
+        color: var(--color-text);
+        min-height: 100vh;
+        display: flex;
+        align-items: flex-start;
+        justify-content: center;
+        padding: 20px;
+      }
+
+      /* --- 2. LAYOUT UTILITIES --- */
+      .app-container {
+        background: var(--color-card);
+        width: 100%;
+        max-width: 500px; /* Default mobile width */
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        overflow: hidden;
+        margin-top: 2vh;
+        transition: max-width 0.3s ease;
+        min-height: 600px;
+      }
+
+      /* Desktop Expand */
+      .app-container.wide {
+        max-width: 900px;
+      }
+
+      .flex-row {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+      }
+      .hidden {
+        display: none !important;
+      }
+      .text-center {
+        text-align: center;
+      }
+      .w-full {
+        width: 100%;
+      }
+      .mt-4 {
+        margin-top: 1rem;
+      }
+      .mb-4 {
+        margin-bottom: 1rem;
+      }
+
+      /* Responsive Layout for Menu */
+      @media (min-width: 768px) {
+        .flex-row {
+          flex-direction: row;
+        }
+        .col-left {
+          width: 60%;
+          border-right: 1px solid #eee;
+        }
+        .col-right {
+          width: 40%;
+        }
+      }
+
+      /* --- 3. TYPOGRAPHY --- */
+      h1 {
+        font-weight: 800;
+        font-size: 1.8rem;
+        color: var(--color-primary);
+      }
+      h2 {
+        font-weight: 700;
+        font-size: 1.5rem;
+        color: var(--color-primary);
+        margin-bottom: 0.5rem;
+      }
+      h3 {
+        font-weight: 700;
+        font-size: 1.2rem;
+        color: var(--color-primary);
+        margin: 1.5rem 0 0.5rem 0;
+      }
+      p {
+        font-size: 0.95rem;
+        line-height: 1.5;
+        color: #666;
+      }
+      .error-text {
+        color: var(--color-danger);
+        font-size: 0.85rem;
+        margin-top: 5px;
+      }
+
+      /* --- 4. COMPONENTS --- */
+
+      /* Inputs */
+      .input-group {
+        margin-bottom: 15px;
+      }
+      .aesthetic-input {
+        width: 100%;
+        padding: 12px 15px;
+        border: 2px solid #eee;
+        border-radius: 12px;
+        font-family: inherit;
+        font-size: 1rem;
+        transition: 0.3s;
+      }
+      .aesthetic-input:focus {
+        outline: none;
+        border-color: var(--color-secondary);
+        box-shadow: 0 0 0 4px rgba(217, 185, 152, 0.2);
+      }
+
+      /* Buttons */
+      .btn {
+        width: 100%;
+        padding: 14px;
+        border: none;
+        border-radius: 50px;
+        font-weight: 600;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: 0.2s;
+      }
+      .btn-primary {
+        background-color: var(--color-primary);
+        color: white;
+        box-shadow: 0 4px 12px rgba(111, 78, 55, 0.3);
+      }
+      .btn-primary:hover {
+        background-color: #5a3e2b;
+        transform: translateY(-2px);
+      }
+      .btn-link {
+        background: none;
+        color: var(--color-secondary);
+        font-weight: bold;
+        cursor: pointer;
+        text-decoration: none;
+      }
+
+      /* Menu Items */
+      .menu-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px;
+        background: #fff;
+        border-radius: 12px;
+        margin-bottom: 10px;
+        border: 1px solid #f0f0f0;
+        transition: 0.2s;
+      }
+      .menu-item:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+      }
+      .item-info {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .item-emoji {
+        font-size: 1.5rem;
+      }
+      .item-details h4 {
+        margin: 0;
+        color: var(--color-text);
+        font-size: 1rem;
+      }
+      .item-details small {
+        font-size: 0.8rem;
+        color: #888;
+      }
+
+      .item-controls {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .qty-btn {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        border: none;
+        color: white;
+        font-weight: bold;
+        cursor: pointer;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      .btn-minus {
+        background-color: var(--color-danger);
+      }
+      .btn-plus {
+        background-color: var(--color-primary);
+      }
+      .btn-minus:disabled {
+        opacity: 0.3;
+        cursor: not-allowed;
+      }
+
+      /* Cart/Order Section */
+      .cart-panel {
+        background-color: #fafafa;
+        padding: 20px;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+      }
+      .cart-items {
+        flex-grow: 1;
+        overflow-y: auto;
+        max-height: 50vh;
+        margin-bottom: 20px;
+      }
+      .order-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 8px 12px;
+        background: white;
+        border-radius: 8px;
+        margin-bottom: 8px;
+        border-left: 4px solid var(--color-primary);
+      }
+      .summary-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 5px;
+        font-size: 1.1rem;
+      }
+      .total-row {
+        font-weight: 800;
+        font-size: 1.4rem;
+        color: var(--color-text);
+        margin-top: 10px;
+        padding-top: 10px;
+        border-top: 2px dashed #ddd;
+      }
+
+      #placeOrderButton {
+        background: linear-gradient(
+          135deg,
+          var(--color-primary),
+          var(--color-secondary)
+        );
+        margin-top: auto;
+      }
+      #placeOrderButton:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        background: #ccc;
+      }
+
+      /* Loading Spinner */
+      .spinner {
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid var(--color-primary);
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 20px auto;
+      }
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+      .loading-view {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+      }
+
+      /* Modal */
+      .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        opacity: 0;
+        pointer-events: none;
+        transition: 0.3s;
+      }
+      .modal-overlay.active {
+        opacity: 1;
+        pointer-events: all;
+      }
+      .modal-content {
+        background: white;
+        padding: 30px;
+        border-radius: 20px;
+        width: 90%;
+        max-width: 400px;
+        text-align: center;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+      }
+      .payment-option {
+        background: #eee;
+        padding: 15px;
+        width: 100%;
+        border-radius: 12px;
+        border: none;
+        font-weight: bold;
+        margin-bottom: 10px;
+        cursor: pointer;
+      }
+      .pay-online {
+        background: #dcfce7;
+        color: #166534;
+      }
+      .pay-cash {
+        background: #fef9c3;
+        color: #854d0e;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app" class="app-container"></div>
+
+    <div id="confirmationModal" class="modal-overlay" onclick="closeModal()">
+      <div class="modal-content" onclick="event.stopPropagation()">
+        <h2 id="modalTitle">Title</h2>
+        <div id="modalBody">Body</div>
+        <div id="paymentOptions" style="margin-top: 20px"></div>
+        <button
+          onclick="closeModal()"
+          class="btn"
+          style="background: #eee; color: #333; margin-top: 15px"
+        >
+          Close
+        </button>
+      </div>
+    </div>
+
+    <script>
+      // ==========================================
+      // 1. MOCKED FIREBASE SETUP
+      // ==========================================
+      window.appId = "cafe-app-123";
+      window.currentUserId = null;
+
+      // Mock DB Data
+      const MOCK_MENU = [
+        {
+          id: "1",
+          name: "Lavender Latte",
+          price: 5.5,
+          description: "Earthy, floral & caffeinated.",
+          category: "Brewed",
+          emoji: "☕",
+        },
+        {
+          id: "2",
+          name: "Matcha Latte",
+          price: 6.0,
+          description: "Bright green goodness.",
+          category: "Specialty",
+          emoji: "🍵",
+        },
+        {
+          id: "3",
+          name: "Caramel Macchiato",
+          price: 6.5,
+          description: "Espresso, milk & caramel.",
+          category: "Specialty",
+          emoji: "🍮",
+        },
+        {
+          id: "4",
+          name: "Chai Spiced Donut",
+          price: 3.5,
+          description: "Soft donut with spicy glaze.",
+          category: "Pastry",
+          emoji: "🍩",
+        },
+        {
+          id: "5",
+          name: "Avocado Toast",
+          price: 9.0,
+          description: "Sourdough, avo & chili.",
+          category: "Food",
+          emoji: "🥑",
+        },
+        {
+          id: "6",
+          name: "Choc Chip Cookie",
+          price: 2.75,
+          description: "Classic, chewy & warm.",
+          category: "Pastry",
+          emoji: "🍪",
+        },
+      ];
+
+      // Mock Functions
+      const mockAuth = {
+        signIn: async (email, pass) => {
+          return new Promise((resolve, reject) => {
+            setTimeout(() => {
+              if (email && pass) {
+                window.currentUserId =
+                  "User-" + Math.floor(Math.random() * 1000);
+                resolve({ user: { uid: window.currentUserId } });
+              } else {
+                reject(new Error("Invalid credentials"));
+              }
+            }, 800);
+          });
+        },
+        register: async (email, pass) => {
+          return new Promise((resolve) => {
+            setTimeout(() => {
+              window.currentUserId = "User-" + Math.floor(Math.random() * 1000);
+              resolve({ user: { uid: window.currentUserId } });
+            }, 800);
+          });
+        },
+      };
+
+      const mockDB = {
+        getMenu: (callback) => {
+          // Simulate network delay then return data
+          setTimeout(() => {
+            callback(MOCK_MENU);
+          }, 500);
+        },
+      };
+
+      // ==========================================
+      // 2. APP STATE
+      // ==========================================
+      window.state = {
+        view: "loading",
+        menu: [],
+        order: {}, // { itemId: quantity }
+      };
+
+      const appContainer = document.getElementById("app");
+
+      // ==========================================
+      // 3. CORE LOGIC
+      // ==========================================
+
+      window.onload = () => {
+        // Check for session or show login
+        renderView("login");
+        // In a real app, you'd check localStorage or Firebase auth state here
+      };
+
+      window.renderView = (viewName) => {
+        window.state.view = viewName;
+        appContainer.innerHTML = "";
+        appContainer.className = "app-container"; // Reset class
+
+        switch (viewName) {
+          case "loading":
+            appContainer.innerHTML = templateLoading();
+            break;
+          case "login":
+            appContainer.innerHTML = templateLogin();
+            break;
+          case "register":
+            appContainer.innerHTML = templateRegister();
+            break;
+          case "menu":
+            appContainer.classList.add("wide"); // Wider layout for menu
+            appContainer.innerHTML = templateMenuShell();
+            loadMenuData();
+            break;
+        }
+      };
+
+      window.handleAuth = async (type) => {
+        const emailId = type === "login" ? "loginEmail" : "registerEmail";
+        const passId = type === "login" ? "loginPassword" : "registerPassword";
+        const msgId = type === "login" ? "loginMessage" : "registerMessage";
+
+        const email = document.getElementById(emailId).value;
+        const password = document.getElementById(passId).value;
+        const msgEl = document.getElementById(msgId);
+
+        msgEl.textContent = "";
+
+        // Basic Validation
+        if (!email || !password) {
+          msgEl.textContent = "Please enter email and password.";
+          return;
+        }
+
+        // Show loading state temporarily inside the button or view
+        renderView("loading");
+
+        try {
+          if (type === "login") {
+            await mockAuth.signIn(email, password);
+          } else {
+            await mockAuth.register(email, password);
+          }
+          renderView("menu");
+        } catch (error) {
+          renderView(type); // Go back to form
+          // Need to re-populate the error message since DOM was wiped
+          setTimeout(
+            () =>
+              (document.getElementById(msgId).textContent =
+                "Authentication failed."),
+            50
+          );
+        }
+      };
+
+      window.loadMenuData = () => {
+        document.getElementById("menuList").innerHTML =
+          '<div class="text-center" style="padding:20px;">Fetching Brews...</div>';
+
+        mockDB.getMenu((data) => {
+          window.state.menu = data;
+          renderMenuHTML();
+        });
+      };
+
+      // ==========================================
+      // 4. RENDERING & TEMPLATES
+      // ==========================================
+
+      const templateLoading = () => `
+            <div class="loading-view">
+                <div class="spinner"></div>
+                <p>Brewing your experience...</p>
+            </div>
+        `;
+
+      const templateLogin = () => `
+            <div style="padding: 40px;">
+                <div class="text-center mb-4">
+                    <h1>The Aesthetic Bean</h1>
+                    <p>Login to your coffee sanctuary.</p>
+                </div>
+                <form onsubmit="event.preventDefault(); handleAuth('login');">
+                    <div class="input-group">
+                        <input type="email" id="loginEmail" placeholder="Email" class="aesthetic-input" required>
+                    </div>
+                    <div class="input-group">
+                        <input type="password" id="loginPassword" placeholder="Password" class="aesthetic-input" required>
+                    </div>
+                    <p id="loginMessage" class="error-text text-center"></p>
+                    <button type="submit" class="btn btn-primary mt-4">Sign In</button>
+                </form>
+                <div class="text-center mt-4">
+                    <p>New here? <a onclick="renderView('register')" class="btn-link">Create Account</a></p>
+                </div>
+            </div>
+        `;
+
+      const templateRegister = () => `
+            <div style="padding: 40px;">
+                <div class="text-center mb-4">
+                    <h2>Join the Club</h2>
+                    <p>Start your aesthetic journey.</p>
+                </div>
+                <form onsubmit="event.preventDefault(); handleAuth('register');">
+                    <div class="input-group">
+                        <input type="email" id="registerEmail" placeholder="Email" class="aesthetic-input" required>
+                    </div>
+                    <div class="input-group">
+                        <input type="password" id="registerPassword" placeholder="Password (min 6 chars)" class="aesthetic-input" required>
+                    </div>
+                    <p id="registerMessage" class="error-text text-center"></p>
+                    <button type="submit" class="btn btn-primary mt-4">Register</button>
+                </form>
+                <div class="text-center mt-4">
+                    <p>Have an account? <a onclick="renderView('login')" class="btn-link">Sign In</a></p>
+                </div>
+            </div>
+        `;
+
+      const templateMenuShell = () => `
+            <div class="flex-row">
+                <div class="col-left" style="padding: 20px; overflow-y: auto; height:100%;">
+                    <div style="margin-bottom: 20px;">
+                        <h2>Menu</h2>
+                        <p style="font-size: 0.8rem;">Welcome, ${window.currentUserId}</p>
+                    </div>
+                    <div id="menuList"></div>
+                </div>
+
+                <div class="col-right cart-panel">
+                    <h2>Your Tray</h2>
+                    <div id="orderList" class="cart-items">
+                        <p class="text-center" style="color:#aaa; margin-top:20px;">Basket empty.</p>
+                    </div>
+
+                    <div style="margin-top: auto;">
+                        <div class="summary-row">
+                            <span>Subtotal:</span>
+                            <span id="subtotalAmount">$0.00</span>
+                        </div>
+                        <div class="summary-row total-row">
+                            <span>Total (inc tax 8%):</span>
+                            <span id="totalAmount">$0.00</span>
+                        </div>
+                        <button id="placeOrderButton" onclick="placeOrder()" class="btn btn-primary mt-4" disabled>
+                            Checkout
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+
+      window.renderMenuHTML = () => {
+        const listContainer = document.getElementById("menuList");
+        if (!listContainer) return;
+
+        // Group by category
+        const categories = window.state.menu.reduce((acc, item) => {
+          if (!acc[item.category]) acc[item.category] = [];
+          acc[item.category].push(item);
+          return acc;
+        }, {});
+
+        let html = "";
+        for (const cat in categories) {
+          html += `<h3>${cat}</h3>`;
+          categories[cat].forEach((item) => {
+            const qty = window.state.order[item.id] || 0;
+            html += `
+                        <div class="menu-item">
+                            <div class="item-info">
+                                <span class="item-emoji">${item.emoji}</span>
+                                <div class="item-details">
+                                    <h4>${item.name}</h4>
+                                    <small>$${item.price.toFixed(2)}</small>
+                                </div>
+                            </div>
+                            <div class="item-controls">
+                                <button onclick="updateOrder('${
+                                  item.id
+                                }', -1)" class="qty-btn btn-minus" ${
+              qty === 0 ? "disabled" : ""
+            }>-</button>
+                                <span style="font-weight:bold; width: 20px; text-align:center;">${qty}</span>
+                                <button onclick="updateOrder('${
+                                  item.id
+                                }', 1)" class="qty-btn btn-plus">+</button>
+                            </div>
+                        </div>
+                    `;
+          });
+        }
+        listContainer.innerHTML = html;
+        renderCartHTML(); // Ensure cart updates if menu re-renders
+      };
+
+      window.renderCartHTML = () => {
+        const orderContainer = document.getElementById("orderList");
+        const subEl = document.getElementById("subtotalAmount");
+        const totalEl = document.getElementById("totalAmount");
+        const btn = document.getElementById("placeOrderButton");
+
+        if (!orderContainer) return;
+
+        let subtotal = 0;
+        let count = 0;
+        let html = "";
+
+        // Calculate totals
+        Object.keys(window.state.order).forEach((id) => {
+          const qty = window.state.order[id];
+          if (qty > 0) {
+            const item = window.state.menu.find((i) => i.id === id);
+            if (item) {
+              const lineTotal = item.price * qty;
+              subtotal += lineTotal;
+              count += qty;
+              html += `
+                            <div class="order-row">
+                                <div>
+                                    <div style="font-weight:600;">${
+                                      item.name
+                                    }</div>
+                                    <div style="font-size:0.8rem; color:#888;">${qty} x $${item.price.toFixed(
+                2
+              )}</div>
+                                </div>
+                                <div style="font-weight:bold;">$${lineTotal.toFixed(
+                                  2
+                                )}</div>
+                            </div>
+                        `;
+            }
+          }
+        });
+
+        if (count === 0) {
+          orderContainer.innerHTML =
+            '<p class="text-center" style="color:#aaa; margin-top:20px;">Basket empty. Add some flair!</p>';
+          subEl.textContent = "$0.00";
+          totalEl.textContent = "$0.00";
+          btn.disabled = true;
+          return;
+        }
+
+        const tax = subtotal * 0.08;
+        const total = subtotal + tax;
+
+        orderContainer.innerHTML = html;
+        subEl.textContent = `$${subtotal.toFixed(2)}`;
+        totalEl.textContent = `$${total.toFixed(2)}`;
+        btn.disabled = false;
+      };
+
+      window.updateOrder = (id, change) => {
+        const current = window.state.order[id] || 0;
+        const next = current + change;
+
+        if (next <= 0) delete window.state.order[id];
+        else window.state.order[id] = next;
+
+        // Re-render
+        renderMenuHTML();
+      };
+
+      // ==========================================
+      // 5. MODALS & CHECKOUT
+      // ==========================================
+
+      window.placeOrder = () => {
+        let total = 0;
+        let itemList = "";
+
+        Object.keys(window.state.order).forEach((id) => {
+          const qty = window.state.order[id];
+          const item = window.state.menu.find((i) => i.id === id);
+          if (item) {
+            total += item.price * qty;
+            itemList += `<li style="text-align:left; margin-bottom:5px;">${qty}x ${item.name}</li>`;
+          }
+        });
+
+        const finalTotal = (total * 1.08).toFixed(2); // re-calc logic with tax
+
+        const paymentHTML = `
+                <div style="text-align:left; background:#f9f9f9; padding:10px; border-radius:8px; margin-bottom:15px;">
+                    <ul style="padding-left:20px; color:#555;">${itemList}</ul>
+                    <hr style="margin:10px 0; border:0; border-top:1px solid #ddd;">
+                    <div style="text-align:right; font-weight:bold; font-size:1.2rem;">$${finalTotal}</div>
+                </div>
+                <button class="payment-option pay-online" onclick="confirmPayment('online')">💳 Card / Apple Pay</button>
+                <button class="payment-option pay-cash" onclick="confirmPayment('cash')">💵 Pay at Counter</button>
+            `;
+
+        showModal(
+          "Confirm Order",
+          "Select your payment method below:",
+          paymentHTML
+        );
+      };
+
+      window.confirmPayment = (method) => {
+        closeModal();
+        // Reset order
+        window.state.order = {};
+        renderMenuHTML();
+        setTimeout(() => {
+          showModal(
+            "Success!",
+            "Your order has been placed.",
+            '<p style="color:green; font-weight:bold;">Kitchen is preparing your aesthetic treat.</p>'
+          );
+        }, 300);
+      };
+
+      window.showModal = (title, body, extraHtml) => {
+        document.getElementById("modalTitle").textContent = title;
+        document.getElementById("modalBody").innerHTML = body;
+        document.getElementById("paymentOptions").innerHTML = extraHtml || "";
+        document.getElementById("confirmationModal").classList.add("active");
+      };
+
+      window.closeModal = () => {
+        document.getElementById("confirmationModal").classList.remove("active");
+      };
+    </script>
+  </body>
+</html>
